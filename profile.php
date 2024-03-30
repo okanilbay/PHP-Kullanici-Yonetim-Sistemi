@@ -6,15 +6,13 @@
     if (isset($_POST["ekle"])) 
     {
 
+        $ogr_no = $_POST["ogr_no"];
         $ogr_ad = $_POST["ogr_ad"];
         $ogr_soyad = $_POST["ogr_soyad"];
-        $ogr_no = $_POST["ogr_no"];
     
-        $ekle = "INSERT INTO ogrenci (ogr_ad,ogr_soyad,ogr_no) VALUES ('$ogr_ad','$ogr_soyad','$ogr_no')";
+        $sql = "INSERT INTO ogrenci (ogr_no,ogr_ad,ogr_soyad) VALUES ('$ogr_no','$ogr_ad','$ogr_soyad')";
         
-        $calistir_ekle = mysqli_query($baglanti_ogr,$ekle);
-        
-        if ($calistir_ekle) {
+        if (mysqli_query($baglanti, $sql)) {
             echo '<div class="alert alert-success" role="alert">
             Kayıt başarılı bir şekilde eklendi.
             </div>';
@@ -24,43 +22,41 @@
             Kayıt eklenirken bir problem oluştu.
             </div>';
         }
-        
-        
     }
 
-    // Öğrenci güncelleme işlemi
-    if(isset($_POST['submit_update'])){
-        $ogrenci_id = $_POST['ogrenci_id_guncelle'];
-        $ogrenci_ad = $_POST['ogrenci_ad_guncelle'];
-        $ogrenci_soyad = $_POST['ogrenci_soyad_guncelle'];
-        $ogrenci_numara = $_POST['ogrenci_numara_guncelle'];
+    //GÜNCELLEME İŞLEMLERİ
+    if(isset($_POST['guncelle'])){
+        $ogrenci_numara = $_POST['ogr_no'];
+        $ogrenci_ad = $_POST['ogr_ad'];
+        $ogrenci_soyad = $_POST['ogr_soyad'];
 
-        $sql = "UPDATE ogrenci SET ogr_ad='$ogrenci_ad', ogr_soyad='$ogrenci_soyad', ogr_no='$ogrenci_numara' WHERE ogr_id='$ogrenci_id'";
+        $sql = "UPDATE ogrenci SET ogr_ad='$ogrenci_ad', ogr_soyad='$ogrenci_soyad' WHERE ogr_no='$ogrenci_numara'";
 
-        if (mysqli_query($baglanti_ogr, $sql)) {
+        if (mysqli_query($baglanti, $sql)) {
             echo "<div class='alert alert-success' role='alert'>Öğrenci bilgileri başarıyla güncellendi.</div>";
         } else {
-            echo "<div class='alert alert-danger' role='alert'>Hata: " . $sql . "<br>" . mysqli_error($baglanti_ogr) . "</div>";
+            echo "<div class='alert alert-danger' role='alert'>Hata: " . $sql . "<br>" . mysqli_error($baglanti) . "</div>";
         }
     }
 
-    if(isset($_GET['delete_id'])){
-        $ogrenci_id = $_GET['delete_id'];
+    //NOT SİLME İŞLEMLERİ
+    if(isset($_POST['sil'])){
+        $ogr_no = $_POST['ogr_no_sil'];
+        $sql = "DELETE FROM ogrenci WHERE ogr_no='$ogr_no'";
 
-        $sql = "DELETE FROM ogrenci WHERE ogr_id='$ogrenci_id'";
-
-        if (mysqli_query($baglanti_ogr, $sql)) {
+        if (mysqli_query($baglanti, $sql)) {
             echo "<div class='alert alert-success' role='alert'>Öğrenci başarıyla silindi.</div>";
         } else {
-            echo "<div class='alert alert-danger' role='alert'>Hata: " . $sql . "<br>" . mysqli_error($baglanti_ogr) . "</div>";
+            echo "<div class='alert alert-danger' role='alert'>Hata: " . $sql . "<br>" . mysqli_error($baglanti) . "</div>";
         }
     }
 
-    $db=new PDO('mysql:host=localhost;dbname=ogrenciler','root','');
-    $gorevler=$db->query("select * from ogrenci");
+    // Veritabanından öğrenci bilgilerini çekme
+    $sql = "SELECT * FROM ogrenci";
+    $result = mysqli_query($baglanti, $sql);
 
     // Veritabanı bağlantısını kapat
-    mysqli_close($baglanti_ogr);
+    mysqli_close($baglanti);
 ?>
 
 
@@ -76,11 +72,13 @@
     <div class="container p-3">
         <!-- HOŞGELDİNİZ BÖLÜMÜ -->
         <div class="card p-3">
+
             <?php
                 session_start();
                 if(isset($_SESSION["ad"]))
                 {
                     echo "<h2>".$_SESSION["ad"]." ".$_SESSION["soyad"]." HOŞGELDİNİZ </h2>";
+                    echo "<a href='notlar.php'>NOT YÖNETİM SAYFASINA GİT</a> ";
                     echo "<a href='cikis.php'>ÇIKIŞ YAP</a> ";
                 }
                 else
@@ -88,114 +86,76 @@
                     echo "<h3>Bu sayfayı görüntülemek için email ve parola ile giriş yapmalısınız.</h3>";
                 }
             ?>
+            
         </div>
     </div>    
     <!-- ÖĞRENCİ BİLGİLERİ LİSTELEME -->
     <div class="container p-3">
         <div class="card p-3">
-            <div class="card-body">
+            <div class="card-body" style="overflow-x:auto;">
                 <h5 class="card-title">Öğrenci Listesi</h5>
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">Öğrenci ID</th>
+                            <th scope="col">Öğrenci Numarası</th> 
                             <th scope="col">Öğrenci Adı</th>
                             <th scope="col">Öğrenci Soyadı</th>
-                            <th scope="col">Öğrenci Numarası</th> 
                         </tr>
                     </thead>
                     <tbody>
                     <?php
-                        foreach ($gorevler as $gorev)
+                        foreach ($result as $gorev)
                         {
-                        echo "<tr><td>".$gorev["ogr_id"]."</td><td>".$gorev["ogr_ad"]."</td><td>".$gorev["ogr_soyad"]."</td><td>".$gorev["ogr_no"]."</td></tr>";
+                        echo "<tr><td>".$gorev["ogr_no"]."</td><td>".$gorev["ogr_ad"]."</td><td>".$gorev["ogr_soyad"]."</td></tr>";
                         }
                     ?>
                     </tbody>
                 </table>
             </div>
-            </div>
-    </div>
-
-
-        <!-- CRUD İŞLEMLERİ -->
-    <div class="container p-3">
-        <div class="row row-cols-1 row-cols-md-2 g-4">
-                <!-- ÖĞRENCİ EKLE BÖLÜMÜ -->
-            <div class="col">
-                <div class="card p-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Yeni Öğrenci Ekle</h5>
-
-                        <form action="profile.php" method="POST">
-                            <div class="form-group">
-                                <label for="ogrenci_ad">Adı:</label>
-                                <input type="text" class="form-control" id="ogrenci_ad" name="ogr_ad">
-                            </div>
-                            <div class="form-group">
-                                <label for="ogrenci_soyad">Soyadı:</label>
-                                <input type="text" class="form-control" id="ogrenci_soyad" name="ogr_soyad">
-                            </div>
-                            <div class="form-group">
-                                <label for="ogrenci_numara">Numarası:</label>
-                                <input type="text" class="form-control" id="ogrenci_numara" name="ogr_no">
-                            </div>
-                            <br>
-                            <button type="submit" class="btn btn-primary" name="ekle">Ekle</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!-- ÖĞRENCİ GÜNCELLE BÖLÜMÜ -->
-            <div class="col">
-                <div class="card p-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Öğrenci Güncelle</h5>
-
-                        <form action="profile.php" method="POST">
-                            <div class="form-group">
-                                <label for="ogrenci_id_guncelle">Öğrenci ID:</label>
-                                <input type="text" class="form-control" id="ogrenci_id_guncelle" name="ogrenci_id_guncelle">
-                            </div>
-                            <div class="form-group">
-                                <label for="ogrenci_ad_guncelle">Adı:</label>
-                                <input type="text" class="form-control" id="ogrenci_ad_guncelle" name="ogrenci_ad_guncelle">
-                            </div>
-                            <div class="form-group">
-                                <label for="ogrenci_soyad_guncelle">Soyadı:</label>
-                                <input type="text" class="form-control" id="ogrenci_soyad_guncelle" name="ogrenci_soyad_guncelle">
-                            </div>
-                            <div class="form-group">
-                                <label for="ogrenci_numara_guncelle">Numarası:</label>
-                                <input type="text" class="form-control" id="ogrenci_numara_guncelle" name="ogrenci_numara_guncelle">
-                            </div>
-                            <br>
-                            <button type="submit" class="btn btn-warning" name="submit_update">Güncelle</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!-- ÖĞRENCİ SİL BÖLÜMÜ -->
-            <div class="col">
-                <div class="card p-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Öğrenci Sil</h5>
-                        <form action="profile.php" method="GET">
-                            <div class="form-group">
-                                <label for="ogrenci_id_sil">Öğrenci ID:</label>
-                                <input type="text" class="form-control" id="ogrenci_id_sil" name="delete_id">
-                            </div>
-                            <br>
-                            <button type="submit" class="btn btn-danger">Sil</button>
-                        </form>
-                    </div>
-                </div>
-            </div>     
         </div>
     </div>
 
-    
+    <div class="container p-3">
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col">
+                <div class="card p-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Ekle-Güncelle İşlemleri</h5>
 
+                        <form action="profile.php" method="POST">
+                             <div class="form-group">
+                                <label for="ogrenci_numara">Öğrenci No:</label>
+                                <input type="text" class="form-control" name="ogr_no" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ogrenci_ad">Öğrenci Adı:</label>
+                                <input type="text" class="form-control" name="ogr_ad" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ogrenci_soyad">Öğrenci Soyadı:</label>
+                                <input type="text" class="form-control" name="ogr_soyad" min="0" required>
+                            </div>
+                            
+                            <br>
+                            <button type="submit" class="btn btn-primary" name="ekle">Ekle</button>
+                            <button type="submit" class="btn btn-warning" name="guncelle">Güncelle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>   
+            <div class="card p-3">
+                <h5 class="card-title">Kayıt Silme İşlemleri</h5>
+                <form action="profile.php"method="POST">
+                    <div class="form-group">
+                        <label for="ogr_no">Öğrenci No:</label>
+                        <input type="number" class="form-control" name="ogr_no_sil" min="0" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-danger" name="sil">Sil</button>
+                </form>
+            </div> 
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>

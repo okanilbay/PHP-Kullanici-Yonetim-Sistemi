@@ -3,7 +3,6 @@ include("baglanti.php");
 
 $mail_err=$parola_err="";
 
-
 //GİRİŞ BUTONUNA TIKLANDIĞINDA
 if (isset($_POST["giris"])) 
 {
@@ -23,7 +22,8 @@ if (isset($_POST["giris"]))
   {
     $parola_err= "Parola alanı boş geçilemez.";
   }
-  else {
+  else 
+  {
     $parola = $_POST["parola"];
   }
 
@@ -43,7 +43,7 @@ if (isset($_POST["giris"]))
             {
                 session_start();
                 $_SESSION["ad"] = $ilgilikayit["ad"];
-                $_SESSION["soyad"] = $ilgilikayit["soyad"];
+                $_SESSION["soyad"] = $ilgilikayit["soyad"];  
                 header("location:profile.php");
             }
             else
@@ -59,18 +59,14 @@ if (isset($_POST["giris"]))
             Email veya parola bilgisi hatalı.
             </div>';
         }
-      
         mysqli_close($baglanti);
     }
 }
 
 //KAYIT OL BUTONUNA TIKLANDIĞINDA
-
 if(isset ($_POST["kayit_ol"])){
     header("location:kayit.php");
 }
-
-
 ?>
 
 <!doctype html>
@@ -83,12 +79,11 @@ if(isset ($_POST["kayit_ol"])){
   </head>
   <body>
     <div class="container p-5">
+      <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center align-items-center">
         <div class="card p-5">
-            <form action="login.php" method="POST">
-
+            <form action="index.php" method="POST">
                 <div class="mb-3">
-                    <h2>Öğrenci Not Sistemine Giriş</h2>
-                    
+                    <h2>Not Otomasyonu Giriş</h2>
                     <label for="exampleInputEmail1" class="form-label">Email Adres</label>
                     <input type="email" class="form-control 
                     <?php
@@ -125,6 +120,7 @@ if(isset ($_POST["kayit_ol"])){
                 <button type="submit" class="btn btn-primary" name="kayit_ol">KAYIT OL</button>
             </form>
         </div>
+      </div>  
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>

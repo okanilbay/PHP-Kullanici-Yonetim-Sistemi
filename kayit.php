@@ -62,32 +62,30 @@ if (isset($_POST["kaydet"]))
       
     //Kayıt sorgusu
 
-    if (isset($ad) && isset($soyad) && isset($mail) && isset($parola) && isset($parolatkr))
-    {
-
-      $ekle = "INSERT INTO kullanicilar (ad,soyad,mail,parola) VALUES ('$ad','$soyad','$mail','$parola')";
-      
-      $calistir_ekle = mysqli_query($baglanti,$ekle);
-      
-      if ($calistir_ekle) {
-        echo '<div class="alert alert-success" role="alert">
-        Kayıt başarılı bir şekilde eklendi.
-        </div>';
-        header("location:login.php");
-      }
-      else {
-        echo '<div class="alert alert-danger" role="alert">
-        Kayıt eklenirken bir problem oluştu.
-        </div>';
-      }
-      mysqli_close($baglanti);
+  if (isset($ad) && isset($soyad) && isset($mail) && isset($parola) && isset($parolatkr))
+  {
+    $ekle = "INSERT INTO kullanicilar (ad,soyad,mail,parola) VALUES ('$ad','$soyad','$mail','$parola')";
+    $calistir_ekle = mysqli_query($baglanti,$ekle);
+    
+    if ($calistir_ekle) {
+      echo '<div class="alert alert-success" role="alert">
+      Kayıt başarılı bir şekilde eklendi.
+      </div>';
     }
+    else {
+      echo '<div class="alert alert-danger" role="alert">
+      Kayıt eklenirken bir problem oluştu.
+      </div>';
+    }
+    mysqli_close($baglanti);
+    header("location:index.php");
+  }
 }
 
 //GİRİŞ YAP BUTONUNA TIKLANDIĞINDA
 if (isset($_POST["giris_yap"]))
 {
-  header("location:login.php");
+  header("location:index.php");
 }
 ?>
 
@@ -101,11 +99,11 @@ if (isset($_POST["giris_yap"]))
   </head>
   <body>
     <div class="container p-5">
+      <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center align-items-center">
         <div class="card p-5">
             <form action="kayit.php" method="POST">
-
                 <div class="mb-3">
-                    <h2>Öğrenci Not Sistemine Kayıt Ol</h2>
+                    <h2>Sistemine Kayıt Ol</h2>
                     <label for="exampleInputEmail1" class="form-label">Ad</label>
                     <input type="text" class="form-control 
                     <?php
@@ -189,6 +187,7 @@ if (isset($_POST["giris_yap"]))
                 <button type="submit" class="btn btn-primary" name="giris_yap">GİRİŞ YAP</button>
             </form>
         </div>
+      </div>  
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
